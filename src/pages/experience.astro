@@ -1,0 +1,44 @@
+---
+import Base from '../layouts/Base.astro';
+import { experience, education, skills } from '../data/profile';
+---
+<Base title="Experience" description="Rushang Chiplunkar's experience in data engineering and applied AI at eClinicalWorks, ZF and Daimler Truck.">
+  <div class="wrap">
+    <header class="page-head">
+      <h1 class="display">Experience</h1>
+    </header>
+    {experience.map((job) => (
+      <section class="job">
+        <h2>{job.company}</h2>
+        <div>
+          {job.roles.map((r) => (
+            <div class="role">
+              <h3>{r.title}</h3>
+              <p class="meta">{r.period}</p>
+              <ul>{r.highlights.map((h) => <li>{h}</li>)}</ul>
+            </div>
+          ))}
+        </div>
+      </section>
+    ))}
+    <section class="job">
+      <h2>Education</h2>
+      <div>
+        {education.map((e) => (
+          <div class="role">
+            <h3>{e.school}</h3>
+            <p class="meta">{e.period}</p>
+            <p>{e.degree}. {e.grade}.</p>
+          </div>
+        ))}
+      </div>
+    </section>
+    <section class="job">
+      <h2>Skills</h2>
+      <div class="skill-grid">
+        {skills.map((s) => (<div><h3>{s.group}</h3><p>{s.items.join(', ')}</p></div>))}
+      </div>
+    </section>
+    <div style="height:64px"></div>
+  </div>
+</Base>

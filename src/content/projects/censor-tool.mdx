@@ -1,0 +1,58 @@
+---
+title: Censor tool
+summary: Command-line tool that redacts names, dates, phone numbers and addresses from text files.
+kind: Course project
+context: CIS 6930, University of Florida
+period: Spring 2024
+role: Sole developer
+stack:
+  - Python
+  - spaCy
+  - Google Natural Language API
+  - PyAP
+  - Regular expressions
+  - pytest
+featured: true
+order: 3
+cover: redaction
+links:
+  repo: https://github.com/rushang01/nlp_censoror_tool
+---
+import Flow from '../../components/Flow.astro';
+
+## Problem
+
+This came from CIS 6930 in Spring 2024. The goal was to automate redacting sensitive details from text documents. The README suggests the Enron Email Dataset for testing.
+
+## My role
+
+I built it alone, including the command-line interface and the tests.
+
+## Architecture
+
+<Flow
+  label="Pipeline: text files pass through PyAP address parsing, spaCy entity recognition and the Google Natural Language API, and become censored files with a statistics report."
+  steps={[['text', 'files'], ['PyAP', 'addresses'], ['spaCy', 'entities'], ['Google', 'NLP'], ['censored', 'files,', 'stats']]}
+/>
+
+You pass a glob of text files and flags for what to redact. It writes censored copies and a stats report.
+
+## Key decisions and trade-offs
+
+I combined three detectors to catch more. spaCy handles named entities, the Google Natural Language API catches what spaCy misses, and PyAP parses addresses. The cost is a dependency on an outside API.
+
+Redacted characters become full blocks, so the text keeps its layout. Spaces inside a name are redacted too, so the pieces of a name don't show.
+
+A separate step finds email addresses and redacts the parts that are names.
+
+If one file fails to read, censor or write, the tool reports it and moves to the next file.
+
+## Results
+
+It handles all four entity types, with a test file for each. I never measured precision or recall on labeled data, so I don't have an accuracy number.
+
+## Failures and limits
+
+It gets things wrong in both directions: some entities are missed, and some text gets censored that shouldn't be. Those errors come from the NLP libraries.
+
+It only works on plain text, and the address parser is set to US addresses.

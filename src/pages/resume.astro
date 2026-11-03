@@ -1,0 +1,44 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import { experience, education, skills } from '../data/profile';
+import { site } from '../site.config';
+
+const projects = (await getCollection('projects', ({ data }) => data.featured && !data.draft && !data.archive))
+  .sort((a, b) => a.data.order - b.data.order);
+---
+<Base title="Resume" description="Resume of Rushang Chiplunkar, data and AI engineer.">
+  <div class="wrap">
+    <header class="page-head"><h1 class="display">Resume</h1></header>
+    <p class="actions r-actions"><a class="btn" href="/rushang-chiplunkar-resume.pdf">Download PDF</a></p>
+    <div class="sheet resume">
+      <p class="r-name title">Rushang Chiplunkar</p>
+      <p class="r-role">Data and AI Engineer | {site.email} | linkedin.com/in/rushang-sunil | github.com/rushang01</p>
+
+      <h2>Experience</h2>
+      {experience.map((job) => (
+        <>
+          <p class="r-co">{job.company}</p>
+          {job.roles.map((r) => (
+            <>
+              <p class="r-line"><b>{r.title}</b><span>{r.period}</span></p>
+              <ul>{r.highlights.map((h) => <li>{h}</li>)}</ul>
+            </>
+          ))}
+        </>
+      ))}
+
+      <h2>Projects</h2>
+      <ul>{projects.map((p) => <li><b>{p.data.title}.</b> {p.data.summary} {p.data.stack.slice(0, 4).join(', ')}.</li>)}</ul>
+
+      <h2>Education</h2>
+      {education.map((e) => (
+        <p class="r-line"><span><b>{e.school}</b>, {e.degree}, {e.grade}</span><span>{e.period}</span></p>
+      ))}
+
+      <h2>Skills</h2>
+      {skills.map((s) => (<p><b>{s.group}:</b> {s.items.join(', ')}</p>))}
+    </div>
+    <div class="r-end" style="height:72px"></div>
+  </div>
+</Base>

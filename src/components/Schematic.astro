@@ -1,0 +1,82 @@
+---
+// The home page's one bold element: the real text-to-SQL stack, sketched.
+// Only components Rushang listed appear here.
+import { sketchBox, sketchLine, sketchArrowHead } from '../lib/sketch';
+
+const stroke = 'var(--mint)';
+const text = 'var(--on-spruce)';
+const pencil = 'var(--coral)';
+
+const row = [
+  { label: ['SQL Server', 'CDC, SQL Agent'], w: 190 },
+  { label: ['dbt'], w: 110 },
+  { label: ['Cube Core', 'semantic layer'], w: 190 },
+  { label: ['FastAPI'], w: 130 },
+  { label: ['React', 'ECharts, TanStack Table'], w: 250 },
+];
+const gap = 40, y = 250, h = 96;
+let cursor = 8;
+const boxes = row.map((b) => { const x = cursor; cursor += b.w + gap; return { ...b, x }; });
+const W = cursor - gap + 8;
+const cube = boxes[2];
+const llm = { x: cube.x - 60, y: 36, w: 124, h: 70 };
+const pyd = { x: cube.x + 106, y: 36, w: 140, h: 70 };
+---
+<div role="img" aria-label="Architecture sketch. Data flows from SQL Server with CDC and SQL Agent into dbt, then Cube Core, then FastAPI, then a React front end with ECharts and TanStack Table. An LLM generates Cube queries, Pydantic validates them, and they run against Cube.">
+  <svg class="sketch schematic-wide" viewBox={`0 0 ${W} 372`} aria-hidden="true">
+    {boxes.map((b, i) => (
+      <g>
+        <path class="draw" pathLength="1" d={sketchBox(b.x, y, b.w, h, 11 + i * 3)} fill="none" stroke={stroke} stroke-width="2.5" stroke-linecap="round" />
+        {b.label.map((t, j) => (
+          <text x={b.x + b.w / 2} y={y + h / 2 + (j - (b.label.length - 1) / 2) * 30 + 8} text-anchor="middle" font-size={j === 0 ? 26 : 19} fill={text}>{t}</text>
+        ))}
+        {i < boxes.length - 1 && (
+          <>
+            <path class="draw" pathLength="1" d={sketchLine(b.x + b.w + 6, y + h / 2, b.x + b.w + gap - 6, y + h / 2, 21 + i)} fill="none" stroke={stroke} stroke-width="2.5" stroke-linecap="round" />
+            <path d={sketchArrowHead(b.x + b.w + gap - 5, y + h / 2, 'right', 10)} fill="none" stroke={stroke} stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+          </>
+        )}
+      </g>
+    ))}
+    <path class="draw" pathLength="1" d={sketchBox(llm.x, llm.y, llm.w, llm.h, 41)} fill="none" stroke={pencil} stroke-width="2.5" stroke-linecap="round" />
+    <text x={llm.x + llm.w / 2} y={llm.y + 44} text-anchor="middle" font-size="26" fill={text}>LLM</text>
+    <path class="draw" pathLength="1" d={sketchBox(pyd.x, pyd.y, pyd.w, pyd.h, 47)} fill="none" stroke={pencil} stroke-width="2.5" stroke-linecap="round" />
+    <text x={pyd.x + pyd.w / 2} y={pyd.y + 44} text-anchor="middle" font-size="26" fill={text}>Pydantic</text>
+    <path class="draw" pathLength="1" d={sketchLine(llm.x + llm.w + 6, llm.y + llm.h / 2, pyd.x - 6, pyd.y + pyd.h / 2, 51)} fill="none" stroke={pencil} stroke-width="2.5" stroke-linecap="round" />
+    <path d={sketchArrowHead(pyd.x - 5, pyd.y + pyd.h / 2, 'right', 9)} fill="none" stroke={pencil} stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+    <path class="draw" pathLength="1" d={sketchLine(pyd.x + pyd.w / 2 - 24, pyd.y + pyd.h + 6, cube.x + cube.w - 50, y - 8, 53)} fill="none" stroke={pencil} stroke-width="2.5" stroke-linecap="round" />
+    <path d={sketchArrowHead(cube.x + cube.w - 50, y - 7, 'down', 10)} fill="none" stroke={pencil} stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+    <text x={pyd.x + pyd.w + 26} y={pyd.y + 28} font-size="21" fill={pencil}>generates Cube queries,</text>
+    <text x={pyd.x + pyd.w + 26} y={pyd.y + 56} font-size="21" fill={pencil}>validated by Pydantic</text>
+  </svg>
+
+  <svg class="sketch schematic-tall" viewBox="0 0 340 680" aria-hidden="true">
+    {['SQL Server|CDC, SQL Agent', 'dbt', 'Cube Core|semantic layer', 'FastAPI', 'React|ECharts, TanStack Table'].map((s, i) => {
+      const yy = 8 + i * 112;
+      const parts = s.split('|');
+      const x = 8, w = 230, hh = 78;
+      return (
+        <g>
+          <path d={sketchBox(x, yy, w, hh, 61 + i * 3)} fill="none" stroke={stroke} stroke-width="2.5" stroke-linecap="round" />
+          {parts.map((t, j) => (
+            <text x={x + w / 2} y={yy + hh / 2 + (j - (parts.length - 1) / 2) * 27 + 7} text-anchor="middle" font-size={j === 0 ? 24 : 17} fill={text}>{t}</text>
+          ))}
+          {i < 4 && (
+            <>
+              <path d={sketchLine(x + w / 2, yy + hh + 5, x + w / 2, yy + 112 - 5, 71 + i)} fill="none" stroke={stroke} stroke-width="2.5" stroke-linecap="round" />
+              <path d={sketchArrowHead(x + w / 2, yy + 112 - 4, 'down', 10)} fill="none" stroke={stroke} stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+            </>
+          )}
+        </g>
+      );
+    })}
+    <path d={sketchBox(254, 164, 80, 54, 81)} fill="none" stroke={pencil} stroke-width="2.5" stroke-linecap="round" />
+    <text x="294" y="198" text-anchor="middle" font-size="20" fill={text}>LLM</text>
+    <path d={sketchBox(254, 262, 80, 54, 83)} fill="none" stroke={pencil} stroke-width="2.5" stroke-linecap="round" />
+    <text x="294" y="296" text-anchor="middle" font-size="16" fill={text}>Pydantic</text>
+    <path d={sketchLine(294, 222, 294, 258, 85)} fill="none" stroke={pencil} stroke-width="2.5" stroke-linecap="round" />
+    <path d={sketchArrowHead(294, 259, 'down', 9)} fill="none" stroke={pencil} stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+    <path d={sketchLine(252, 278, 243, 262, 87)} fill="none" stroke={pencil} stroke-width="2.5" stroke-linecap="round" />
+    <path d={sketchArrowHead(242, 262, 'left', 9)} fill="none" stroke={pencil} stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+  </svg>
+</div>

@@ -1,0 +1,28 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+
+const posts = (await getCollection('writing', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+const fmt = new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+---
+<Base title="Writing" description="Technical writing by Rushang Chiplunkar.">
+  <div class="wrap">
+    <header class="page-head">
+      <h1 class="display">Writing</h1>
+      <p class="lede">Reports and documentation I've written.</p>
+    </header>
+    <ul class="list">
+      {posts.map((p) => (
+        <li>
+          <div>
+            <h2><a href={p.data.file ?? `/writing/${p.id}`}>{p.data.title}</a></h2>
+            <p>{p.data.summary}</p>
+          </div>
+          <span class="when">{p.data.kind}, {fmt.format(p.data.date)}</span>
+        </li>
+      ))}
+    </ul>
+    <div style="height:120px"></div>
+  </div>
+</Base>

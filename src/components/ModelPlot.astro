@@ -1,0 +1,38 @@
+---
+// Plots the evaluation table from the recommender's Milestone 3 report.
+import { sketchLine } from '../lib/sketch';
+
+interface Props { compact?: boolean; }
+const { compact = false } = Astro.props;
+const models = [
+  { name: 'Content-based', x: 0.825, y: 0.64, lx: 0, ly: 32, anchor: 'middle' },
+  { name: 'Personalized', x: 0.8762, y: 0.8713, lx: -14, ly: 6, anchor: 'end' },
+  { name: 'Hybrid', x: 0.918, y: 0.893, lx: 2, ly: -18, anchor: 'middle', win: true },
+  { name: 'Collaborative', x: 0.998, y: 0.133, lx: -14, ly: 6, anchor: 'end' },
+];
+const W = compact ? 440 : 560, H = compact ? 350 : 430, L = 84, R = 22, T = 18, B = 62;
+const xMin = 0.7, xMax = 1;
+const px = (v: number) => L + ((v - xMin) / (xMax - xMin)) * (W - L - R);
+const py = (v: number) => H - B - v * (H - T - B);
+const xTicks = [0.7, 0.8, 0.9, 1];
+const yTicks = [0, 0.25, 0.5, 0.75, 1];
+---
+<svg class="sketch" viewBox={`0 0 ${W} ${H}`} role="img" aria-label="Scatter plot of four recommendation methods. Hybrid scores 0.918 rating precision and 0.893 cuisine match. Collaborative filtering scores 0.998 and 0.133.">
+  {yTicks.map((t) => (<line x1={L} x2={W - R} y1={py(t)} y2={py(t)} stroke="var(--grid)" />))}
+  {xTicks.map((t) => (<line y1={T} y2={H - B} x1={px(t)} x2={px(t)} stroke="var(--grid)" />))}
+  <path d={sketchLine(L, H - B, W - R, H - B, 4, 1.5)} fill="none" stroke="var(--ink)" stroke-width="2.5" stroke-linecap="round" />
+  <path d={sketchLine(L, H - B, L, T, 5, 1.5)} fill="none" stroke="var(--ink)" stroke-width="2.5" stroke-linecap="round" />
+  {xTicks.map((t) => (<text x={px(t)} y={H - B + 26} text-anchor="middle" font-size="19" fill="var(--ink)">{t.toFixed(1)}</text>))}
+  {yTicks.filter((t) => t > 0).map((t) => (<text x={L - 12} y={py(t) + 6} text-anchor="end" font-size="19" fill="var(--ink)">{t.toFixed(2).replace(/0$/, '')}</text>))}
+  <text x={(L + W - R) / 2} y={H - 8} text-anchor="middle" font-size="20" fill="var(--ink)">rating precision</text>
+  <text transform={`translate(20 ${(T + H - B) / 2}) rotate(-90)`} text-anchor="middle" font-size="20" fill="var(--ink)">cuisine match rate</text>
+  {models.map((m) => (
+    <g>
+      <circle cx={px(m.x)} cy={py(m.y)} r={m.win ? 10 : 7} fill={m.win ? 'var(--pencil)' : 'var(--ink)'} />
+      <text x={px(m.x) + m.lx} y={py(m.y) + m.ly} text-anchor={m.anchor} font-size="20" fill={m.win ? 'var(--pencil)' : 'var(--ink)'}>{m.name}</text>
+    </g>
+  ))}
+  {!compact && (
+    <text x={px(0.998) - 14} y={py(0.133) + 30} text-anchor="end" font-size="19" fill="var(--pencil)">similar ratings, different food</text>
+  )}
+</svg>

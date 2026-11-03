@@ -1,0 +1,96 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import Schematic from '../components/Schematic.astro';
+import ProjectCover from '../components/ProjectCover.astro';
+import { positioning, fieldNotes, experience } from '../data/profile';
+import { site } from '../site.config';
+
+const featured = (await getCollection('projects', ({ data }) => data.featured && !data.draft && !data.archive))
+  .sort((a, b) => a.data.order - b.data.order);
+---
+<Base>
+  <section class="hero">
+    <div class="wrap">
+      <div class="hero-grid">
+        <div>
+          <h1 class="display">{positioning.headline}</h1>
+          <p class="lede">{positioning.intro}</p>
+          <div class="actions">
+            <a class="btn" href="/projects">See the work</a>
+            <a class="quiet" href="/resume">Resume</a>
+            <a class="quiet" href={site.linkedin}>LinkedIn</a>
+          </div>
+        </div>
+        <div class="sheet tape notes-sheet">
+          <ul>
+            {fieldNotes.map((n) => (<li><b>{n.value}</b><span>{n.label}</span></li>))}
+          </ul>
+        </div>
+      </div>
+      <p class="seeking">{positioning.seeking} MS from the University of Florida, 3.96 GPA.</p>
+    </div>
+  </section>
+
+  <section class="chapter dark">
+    <div class="wrap">
+      <div class="split-head">
+        <h2 class="title">The text-to-SQL agent</h2>
+        <p class="lede">An LLM generates Cube queries and Pydantic validates them. To build the semantic layer, I had another agent parse call transcripts, our report repository and its documentation into YAML and Markdown. I used that with hybrid retrieval and a live database connection, which came to 400K rows of context.</p>
+      </div>
+      <Schematic />
+    </div>
+  </section>
+
+  <section class="chapter">
+    <div class="wrap">
+      <div class="split-head">
+        <h2 class="title">Experience</h2>
+      </div>
+      <ul class="ledger">
+        {experience.map((job) => (
+          <li>
+            <h3>{job.company}<span class="meta">{job.roles.map((r) => r.title).join(' and ')}, {job.roles[job.roles.length - 1].period.split(' – ')[0]} – {job.roles[0].period.split(' – ')[1]}</span></h3>
+            <p>{job.summary}</p>
+          </li>
+        ))}
+      </ul>
+      <p class="chapter-foot"><a class="quiet" href="/experience">Full experience</a></p>
+    </div>
+  </section>
+
+  <section class="chapter" style="padding-top:0">
+    <div class="wrap">
+      <div class="split-head">
+        <h2 class="title">Projects</h2>
+        <p class="lede">Course projects I can show in full, including what didn't work.</p>
+      </div>
+      <div class="featured">
+        {featured.map((p) => (
+          <article class="feature">
+            <a class="feature-cover cover-link" href={`/projects/${p.id}`} tabindex="-1" aria-hidden="true">
+              <ProjectCover cover={p.data.cover} stack={p.data.stack} title={p.data.title} />
+            </a>
+            <div>
+              <p class="meta">{p.data.kind}, {p.data.period}</p>
+              <h3>{p.data.title}</h3>
+              <p>{p.data.summary}</p>
+              <a class="quiet" href={`/projects/${p.id}`}>Read more<span class="sr">: {p.data.title}</span></a>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="chapter band">
+    <div class="wrap inner">
+      <h2 class="title">Contact</h2>
+      <p class="lede">{positioning.seeking}</p>
+      <div class="actions">
+        <a class="btn" href={`mailto:${site.email}`}>Email me</a>
+        <a class="quiet" href="/resume">Resume</a>
+      </div>
+    </div>
+  </section>
+</Base>

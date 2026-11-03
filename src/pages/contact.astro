@@ -1,0 +1,19 @@
+---
+import Base from '../layouts/Base.astro';
+import { positioning } from '../data/profile';
+import { site } from '../site.config';
+---
+<Base title="Contact" description="Contact Rushang Chiplunkar about data platform, data engineering and applied AI roles.">
+  <div class="wrap">
+    <header class="page-head">
+      <h1 class="display">Contact</h1>
+      <p class="lede">{positioning.seeking}</p>
+    </header>
+    <ul class="list">
+      <li><div><h2><a href={`mailto:${site.email}`}>{site.email}</a></h2></div><span class="when">Email</span></li>
+      <li><div><h2><a href={site.linkedin}>rushang-sunil</a></h2></div><span class="when">LinkedIn</span></li>
+      <li><div><h2><a href={site.github}>rushang01</a></h2></div><span class="when">GitHub</span></li>
+    </ul>
+    <div style="height:120px"></div>
+  </div>
+</Base>

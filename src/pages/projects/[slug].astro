@@ -1,0 +1,62 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import ProjectCover from '../../components/ProjectCover.astro';
+import { site } from '../../site.config';
+
+export async function getStaticPaths() {
+  const projects = await getCollection('projects', ({ data }) => !data.draft && !data.archive);
+  return projects.map((p) => ({ params: { slug: p.id }, props: { p } }));
+}
+const { p } = Astro.props;
+const { Content } = await render(p);
+const d = p.data;
+const links = [
+  site.showRepoLinks && d.links.repo ? { href: d.links.repo, label: 'Source code' } : null,
+  d.links.demo ? { href: d.links.demo, label: 'Live demo' } : null,
+  d.links.report ? { href: d.links.report, label: 'Full report (PDF)' } : null,
+].filter(Boolean) as { href: string; label: string }[];
+---
+<Base title={d.title} description={d.summary}>
+  <div class="wrap">
+    <header class="page-head project-head">
+      <div>
+        <p class="meta">{d.kind}, {d.period}</p>
+        <h1 class="title">{d.title}</h1>
+        <p class="lede">{d.summary}</p>
+      </div>
+      <ProjectCover cover={d.cover} stack={d.stack} title={d.title} />
+    </header>
+    <dl class="facts">
+      <div><dt>Context</dt><dd>{d.context}</dd></div>
+      <div><dt>Role</dt><dd>{d.role}</dd></div>
+      <div><dt>Stack</dt><dd>{d.stack.join(', ')}</dd></div>
+    </dl>
+  </div>
+  {d.results.length > 0 && (
+    <section class="dark" style="margin-top:56px;padding-block:56px">
+      <div class="wrap">
+        <h2 class="sr">Key results</h2>
+        <ul class="results">
+          {d.results.map((r) => (<li><b>{r.value}</b><span>{r.label}</span></li>))}
+        </ul>
+      </div>
+    </section>
+  )}
+  <div class="wrap" style="padding-block:72px 48px">
+    <div class="sheet prose-sheet">
+      <article class="prose">
+        <Content />
+        {links.length > 0 && (
+          <>
+            <h2>Links</h2>
+            <ul class="proj-links">
+              {links.map((l) => (<li><a class="quiet" href={l.href}>{l.label}</a></li>))}
+            </ul>
+          </>
+        )}
+      </article>
+    </div>
+    <p style="margin-top:32px"><a class="quiet" href="/projects">All projects</a></p>
+  </div>
+</Base>

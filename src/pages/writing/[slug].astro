@@ -1,0 +1,22 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('writing', ({ data }) => !data.draft && !data.file);
+  return posts.map((p) => ({ params: { slug: p.id }, props: { p } }));
+}
+const { p } = Astro.props;
+const { Content } = await render(p);
+const fmt = new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+---
+<Base title={p.data.title} description={p.data.summary}>
+  <div class="wrap">
+    <header class="page-head">
+      <p class="meta">{p.data.kind}, {fmt.format(p.data.date)}</p>
+      <h1 class="title">{p.data.title}</h1>
+    </header>
+    <div class="sheet prose-sheet"><article class="prose"><Content /></article></div>
+    <div style="height:72px"></div>
+  </div>
+</Base>

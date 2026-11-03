@@ -1,0 +1,53 @@
+---
+# Copy with: npm run new:project my-project-slug
+title: Project name
+summary: One sentence, under 160 characters, on what it does and why it matters.
+kind: Personal project # Course project, Personal project, Open source or Work
+context: Where it came from, such as a course, an employer or a side project
+period: Spring 2026
+role: What you did, such as sole developer
+stack:
+  - Python
+featured: false # true puts this project on the homepage
+order: 10 # lower numbers appear first
+archive: false # true lists it under Earlier work, with no detail page
+draft: true # true hides it everywhere; set false when ready
+cover: auto # auto, plot, redaction or flow
+results:
+  - value: "0"
+    label: Replace with a real, sourced result, or delete this entry
+links:
+  repo: https://github.com/rushang01/REPO
+  # demo: https://example.com
+  # report: /writing/report.pdf
+---
+import Flow from '../../components/Flow.astro';
+import Note from '../../components/Note.astro';
+
+## Problem
+
+What was broken or missing, and for whom.
+
+## My role
+
+What you personally did. Name anyone you worked with.
+
+## Architecture
+
+<Flow label="Describe the diagram for screen readers" steps={[['source'], ['transform'], ['output']]} />
+
+How the parts fit together.
+
+## Key decisions and trade-offs
+
+Each decision, the alternative, and what it cost.
+
+## Results
+
+Measured outcomes only. If nothing was measured, say so.
+
+## Failures and limits
+
+What broke, what's still weak, and what you'd change.
+
+<Note>Use a margin note for one sharp observation.</Note>

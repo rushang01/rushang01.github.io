@@ -1,0 +1,90 @@
+---
+title: Hybrid restaurant recommender
+summary: Combines three Bangalore restaurant datasets and ranks restaurants by cuisine, area and budget.
+kind: Course project
+context: CAP5771 Intro to Data Science, University of Florida
+period: Spring 2025
+role: Sole developer
+stack:
+  - Python
+  - pandas
+  - scikit-learn
+  - SciPy SVD
+  - TF-IDF
+  - ijson
+  - Google Places API
+  - Streamlit
+  - Plotly
+featured: true
+order: 1
+cover: plot
+results:
+  - value: "0.918"
+    label: rating precision
+  - value: "0.893"
+    label: cuisine match rate
+  - value: "9,848"
+    label: restaurants in the final dataset
+links:
+  repo: https://github.com/rushang01/restaurant_recommender
+  report: /writing/hybrid-recommender-evaluation.pdf
+---
+import Flow from '../../components/Flow.astro';
+import ModelPlot from '../../components/ModelPlot.astro';
+
+## Problem
+
+This was my project for CAP5771 in Spring 2025. Restaurant reviews for Bangalore sit on different platforms, and nothing combined the ratings and review counts from Zomato and Swiggy. I wanted a tool where you enter a cuisine, area and budget and get a ranked list.
+
+## My role
+
+I did this alone, from collecting the data to building the Streamlit app.
+
+## Architecture
+
+<Flow
+  label="Pipeline: three source datasets are cleaned and merged, enriched through the Google Places API, scored with TF-IDF, SVD and popularity, blended into a hybrid score, and served in a Streamlit app."
+  steps={[['3 source', 'datasets'], ['clean,', 'merge'], ['Google', 'Places'], ['TF-IDF,', 'SVD,', 'popularity'], ['hybrid', 'score'], ['Streamlit']]}
+/>
+
+The three sources merged into 14,393 rows. I enriched those through the Google Places API, dropped duplicates by `place_id` and joined back on name and address, which left 9,848 restaurants.
+
+TF-IDF on cuisines, location and place types gives the content score. SVD on a location-by-restaurant matrix gives the collaborative score. Popularity mixes rating, rating count and inverse cost at 0.6, 0.3 and 0.1.
+
+## Key decisions and trade-offs
+
+The Swiggy file was almost 1 GB, so I streamed it with `ijson`.
+
+The data has no user history, so I used location as a stand-in for the user. That's a big simplification, because it picks up area trends and misses individual taste, but it let me try collaborative filtering at all.
+
+The final weights are 0.60 content, 0.30 popularity and 0.10 collaborative. Content and popularity were stronger signals than location in this data.
+
+Without user interactions I couldn't use standard ranking metrics, so I wrote two of my own: rating precision and cuisine match rate.
+
+## Results
+
+I sampled 100 restaurants at random and generated the top 10 recommendations for each.
+
+<figure class="figure">
+  <ModelPlot />
+  <figcaption>Results from my final report. The x-axis starts at 0.7.</figcaption>
+</figure>
+
+| Method | Rating precision | Cuisine match rate |
+|---|---|---|
+| Content-based | 0.825 | 0.640 |
+| Personalized | 0.876 | 0.871 |
+| Collaborative filtering | 0.998 | 0.133 |
+| Hybrid | 0.918 | 0.893 |
+
+I went with the hybrid because it was the most balanced.
+
+## Failures and limits
+
+Collaborative filtering scored 0.998 on rating precision but 0.133 on cuisine match. It found restaurants with similar ratings that served different food.
+
+Rating precision is looser than my report says. The report describes it as within ±0.5 of the source rating, but the code only checks the lower bound, so anything rated higher also counts.
+
+I had no real user feedback, so there's no true train and test split on user interactions. These numbers measure relevance and can't tell you whether anyone would like the recommendations.
+
+Popularity carries a lot of weight, so well-known places get favored. New restaurants and new locations have a cold-start problem, and the data is a static snapshot.

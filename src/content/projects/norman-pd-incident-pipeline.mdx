@@ -1,0 +1,64 @@
+---
+title: Norman PD incident pipeline
+summary: Pulls police incident PDFs into structured data and adds weather, location and frequency rankings.
+kind: Course project
+context: CIS 6930, University of Florida
+period: Spring 2024
+role: Sole developer
+stack:
+  - Python
+  - PyMuPDF
+  - SQLite
+  - Regular expressions
+  - ThreadPoolExecutor
+  - Google Geocoding API
+  - Open-Meteo
+  - pytest
+featured: true
+order: 2
+cover: flow
+links:
+  repo: https://github.com/rushang01/pdf_extracted_data_analysis
+---
+import Flow from '../../components/Flow.astro';
+
+## Problem
+
+This came from CIS 6930 in Spring 2024. The Norman, Oklahoma Police Department publishes incident summaries as PDFs, so you can't query them. The work was to extract the incidents, store them, and add context such as weather and location.
+
+## My role
+
+I built both stages alone. The first downloads the PDFs and stores incidents in SQLite. The second adds the extra fields and rankings.
+
+## Architecture
+
+<Flow
+  label="Pipeline: a CSV of PDF URLs drives downloads, PyMuPDF extracts incidents, the Google Geocoding API and Open-Meteo add location and weather, and incidents are ranked and output as rows."
+  steps={[['CSV of', 'PDF URLs'], ['download'], ['PyMuPDF'], ['geocode,', 'weather'], ['rank'], ['ranked', 'rows']]}
+/>
+
+It starts from a CSV of PDF URLs. Each incident gains seven fields: day of week, hour, weather code, side of town, location rank, nature rank and an EMSSTAT flag.
+
+## Key decisions and trade-offs
+
+I read word positions and assign each word to a column by its x-coordinate. That keeps multi-line cells in the right field, but the column positions are fixed, so a layout change would break it.
+
+Geocoding and weather lookups run in thread pools with 10 workers. Everything else runs in sequence.
+
+Side of town comes from the bearing between the town center and the incident, mapped to one of eight compass directions.
+
+If an address can't be geocoded, I keep the row and mark those fields "Unknown".
+
+Ranks keep ties, so incidents with the same frequency get the same rank. I also wrote a [datasheet](/writing/incident-datasheet) for the dataset.
+
+## Results
+
+It takes a list of PDF URLs and outputs one enriched row per incident. There are tests for dates, downloads, geocoding, ranking and weather. I didn't measure how much time the thread pools saved.
+
+## Failures and limits
+
+Weather and side of town both depend on the geocode, so one failed lookup leaves those fields as "Unknown".
+
+There's a bug in the geocoding cache. It only stores failed lookups, so addresses that worked get fetched again.
+
+It can only process reports that are still on the department's website, and it doesn't run on a schedule.

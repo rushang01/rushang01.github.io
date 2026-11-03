@@ -1,0 +1,45 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import { site } from '../../site.config';
+
+const all = (await getCollection('projects', ({ data }) => !data.draft)).sort((a, b) => a.data.order - b.data.order);
+const main = all.filter((p) => !p.data.archive);
+const earlier = all.filter((p) => p.data.archive);
+---
+<Base title="Projects" description="Data engineering and applied AI projects by Rushang Chiplunkar, with architecture, trade-offs and failures.">
+  <div class="wrap">
+    <header class="page-head">
+      <h1 class="display">Projects</h1>
+      <p class="lede">These are mostly coursework, because I can't share much detail about work I've done for employers. That work is on the Experience page.</p>
+    </header>
+    <ul class="list">
+      {main.map((p) => (
+        <li>
+          <div>
+            <h2><a href={`/projects/${p.id}`}>{p.data.title}</a></h2>
+            <p>{p.data.summary}</p>
+          </div>
+          <span class="when">{p.data.kind}, {p.data.period}</span>
+        </li>
+      ))}
+    </ul>
+    {earlier.length > 0 && (
+      <section class="chapter" style="padding-bottom:0">
+        <h2 class="section-title">Earlier work</h2>
+        <ul class="list">
+          {earlier.map((p) => (
+            <li>
+              <div>
+                <h3>{site.showRepoLinks && p.data.links.repo ? <a href={p.data.links.repo}>{p.data.title}</a> : p.data.title}</h3>
+                <p>{p.data.summary}</p>
+              </div>
+              <span class="when">{p.data.kind}, {p.data.period}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
+    <div style="height:96px"></div>
+  </div>
+</Base>

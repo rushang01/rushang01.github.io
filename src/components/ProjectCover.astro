@@ -1,0 +1,33 @@
+---
+import ModelPlot from './ModelPlot.astro';
+import Flow from './Flow.astro';
+
+interface Props { cover: string; stack: string[]; title: string; }
+const { cover, stack, title } = Astro.props;
+---
+<div class="sheet tape cover">
+  {cover === 'plot' && (
+    <>
+      <ModelPlot compact />
+      <p class="cap">results from my final report</p>
+    </>
+  )}
+  {cover === 'redaction' && (
+    <>
+      <p class="typed">John Doe went to the park.</p>
+      <p class="typed"><span class="blk" aria-label="Name redacted">████████</span> went to the park.</p>
+      <p class="cap">a test case from the repo</p>
+    </>
+  )}
+  {cover === 'flow' && (
+    <>
+      <Flow label={`${title}: police PDFs become ranked rows with geocoding and weather`} seed={9} boxW={112} gap={30} font={21} steps={[['police', 'PDFs'], ['PyMuPDF'], ['geocode,', 'weather'], ['ranked', 'rows']]} />
+      <p class="cap">police PDFs to ranked rows</p>
+    </>
+  )}
+  {cover === 'auto' && (
+    <div class="cover-auto">
+      <ul>{stack.slice(0, 6).map((s) => <li>{s}</li>)}</ul>
+    </div>
+  )}
+</div>

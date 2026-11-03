@@ -1,0 +1,56 @@
+---
+// A sketched left-to-right process diagram. Works from one prop, so any
+// project file can draw its architecture without a custom component.
+import { sketchBox, sketchLine, sketchArrowHead } from '../lib/sketch';
+
+interface Props { steps: string[][]; label: string; seed?: number; boxW?: number; gap?: number; font?: number; }
+const many = Astro.props.steps.length >= 5;
+const { steps, label, seed = 3, boxW = many ? 118 : 150, gap = many ? 22 : 44, font = 20 } = Astro.props;
+const boxH = 92, pad = 8;
+const w = steps.length * boxW + (steps.length - 1) * gap + pad * 2;
+const h = boxH + pad * 2 + 6;
+const tall = { boxW: 260, boxH: 74, gap: 40 };
+const th = steps.length * tall.boxH + (steps.length - 1) * tall.gap + pad * 2 + 6;
+---
+<div role="img" aria-label={label}>
+  <svg class="sketch schematic-wide" viewBox={`0 0 ${w} ${h}`} aria-hidden="true">
+    {steps.map((lines, i) => {
+      const x = pad + i * (boxW + gap);
+      const y = pad + 3;
+      return (
+        <g>
+          <path d={sketchBox(x, y, boxW, boxH, seed + i * 5)} fill="none" stroke="var(--ink)" stroke-width="2" stroke-linecap="round" />
+          {lines.map((t, j) => (
+            <text x={x + boxW / 2} y={y + boxH / 2 + (j - (lines.length - 1) / 2) * 24 + 7} text-anchor="middle" font-size={font} fill="var(--ink)">{t}</text>
+          ))}
+          {i < steps.length - 1 && (
+            <>
+              <path d={sketchLine(x + boxW + 6, y + boxH / 2, x + boxW + gap - 6, y + boxH / 2, seed + i)} fill="none" stroke="var(--pencil)" stroke-width="2.5" stroke-linecap="round" />
+              <path d={sketchArrowHead(x + boxW + gap - 5, y + boxH / 2, 'right', 10)} fill="none" stroke="var(--pencil)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+            </>
+          )}
+        </g>
+      );
+    })}
+  </svg>
+  <svg class="sketch schematic-tall" viewBox={`0 0 ${tall.boxW + pad * 2} ${th}`} aria-hidden="true">
+    {steps.map((lines, i) => {
+      const x = pad;
+      const y = pad + 3 + i * (tall.boxH + tall.gap);
+      return (
+        <g>
+          <path d={sketchBox(x, y, tall.boxW, tall.boxH, seed + i * 5)} fill="none" stroke="var(--ink)" stroke-width="2" stroke-linecap="round" />
+          {lines.map((t, j) => (
+            <text x={x + tall.boxW / 2} y={y + tall.boxH / 2 + (j - (lines.length - 1) / 2) * 24 + 7} text-anchor="middle" font-size="21" fill="var(--ink)">{t}</text>
+          ))}
+          {i < steps.length - 1 && (
+            <>
+              <path d={sketchLine(x + tall.boxW / 2, y + tall.boxH + 6, x + tall.boxW / 2, y + tall.boxH + tall.gap - 6, seed + i)} fill="none" stroke="var(--pencil)" stroke-width="2.5" stroke-linecap="round" />
+              <path d={sketchArrowHead(x + tall.boxW / 2, y + tall.boxH + tall.gap - 5, 'down', 10)} fill="none" stroke="var(--pencil)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+            </>
+          )}
+        </g>
+      );
+    })}
+  </svg>
+</div>
